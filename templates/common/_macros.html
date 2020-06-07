@@ -1,0 +1,4 @@
+{#这里定义了一个宏，使用 -  可以去掉换行符#}
+{% macro static(filename) -%}
+    {{ url_for("static",filename=filename) }}
+{%- endmacro %}
