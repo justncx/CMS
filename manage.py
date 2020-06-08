@@ -9,7 +9,7 @@ from apps.cms import models as cms_models
 
 CMSRole = cms_models.CMSRole
 CMSPermission = cms_models.CMSPermission
-
+CMSUser = cms_models.CMSUser
 
 app = create_app()
 manager = Manager(app)
@@ -48,6 +48,35 @@ def create_role():
 
     db.session.add_all([visitor, operator, admin, developer])
     db.session.commit()
+
+
+@manager.option('-e', '--email', dest='email')
+@manager.option('-n', '--name', dest='name')
+def add_user_to_role(email, name):
+    user = CMSUser.query.filter_by(email=email).first()
+    if user:
+        role = CMSRole.query.filter_by(name=name).first()
+        if role:
+            role.users.append(user)
+            db.session.commit()
+            print('用户添加角色成功')
+        else:
+            print('没有这个角色' % role)
+    else:
+        print('%s :邮箱未注册' % email)
+
+
+@manager.option('-e', '--email', dest='email')
+def test_permission(email):
+    user = CMSUser.query.filter_by(email=email).first()
+    if user.is_developer:
+        print('这个用户是开发者')
+    else:
+        print('这个用户不是开发者')
+    if user.has_permission(CMSPermission.VISITOR):
+        print('这个用户有访问者的权限')
+    else:
+        print('这个用户没有访问者的权限')
 
 
 if __name__ == '__main__':

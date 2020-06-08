@@ -61,6 +61,7 @@ class CMSUser(db.Model):
     def password(self):
         return self._password
 
+    # 对存入的密码进行加密，对外的字段命名叫做password，对内使用的字段名叫做_password
     @password.setter
     def password(self, raw_password):
         self._password = generate_password_hash(raw_password)
@@ -69,5 +70,22 @@ class CMSUser(db.Model):
         result = check_password_hash(self.password, raw_password)
         return result
 
-    # 对存入的密码进行加密，对外的字段命名叫做password，对内使用的字段名叫做_password
+    @property
+    def permissions(self):
+        if not self.roles:
+            return 0
+        all_permissions = 0
+        for role in self.roles:
+            permissions = role.permissions
+            all_permissions |= role.permissions
+        return all_permissions
 
+    def has_permission(self, permission):
+        # all_permissions = self.permissions
+        # result = all_permissions & permission == permission
+        # return result
+        return self.permissions & permission == permission
+
+    @property
+    def is_developer(self):
+        return self.has_permission(CMSPermission.ALL_PERMISSION)
