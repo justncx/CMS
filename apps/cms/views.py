@@ -3,8 +3,8 @@
 from flask import Blueprint, render_template, views, request, session, redirect,\
     url_for, g, jsonify
 from .forms import LoginForm, ResetPassworldForm, ResetEmailForm
-from .models import CMSUser
-from .decorates import login_required
+from .models import CMSUser, CMSPermission
+from .decorates import login_required, permission_required
 import config
 from exts import db, mail
 from flask_mail import Message
@@ -129,6 +129,40 @@ class ResetPwdView(views.MethodView):
             # })
             return restful.paramerror(form.get_error())
             # return restful.paramerror()
+
+
+# 先判断登录，再判断权限
+# bp.route('/posts/') 这个要写在上边。为什么？？？
+@bp.route('/posts/')
+@login_required
+@permission_required(CMSPermission.POSTER)
+def posts():
+    return render_template('cms/cms_posts.html')
+
+
+@bp.route('/comments/')
+def comments():
+    return render_template('cms/cms_comments.html')
+
+
+@bp.route('/boards/')
+def boards():
+    return render_template('cms/cms_boards.html')
+
+
+@bp.route('/fusers/')
+def fusers():
+    return render_template('cms/cms_fusers.html')
+
+@bp.route('/cusers/')
+def cusers():
+    return render_template('cms/cms_cusers.html')
+
+
+@bp.route('/croles/')
+def croles():
+    return render_template('cms/cms_croles.html')
+
 
 # 这里使用类视图
 class LoginView(views.MethodView):
