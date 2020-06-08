@@ -6,7 +6,7 @@ HOSTNAME = 'localhost'
 PORT = 3306
 DATABASE = 'cms'
 USERNAME = 'root'
-PASSWORD = 'ncx940322'
+PASSWORD = '11111'
 
 # dialect+driver://username:password@host:port/database
 DB_URL = 'mysql+pymysql://{username}:{password}@{host}:{port}/{db}?' \
@@ -31,6 +31,6 @@ MAIL_PORT = '465'
 # MAIL_USE_TLS = True
 MAIL_USE_SSL = True
 MAIL_DEBUG = True
-MAIL_USERNAME = '2668481981@qq.com'
+MAIL_USERNAME = '1322312@qq.com'
 MAIL_PASSWORD = 'novhaifjorsqdjgg'
-MAIL_DEFAULT_SENDER = '2668481981@qq.com'
+MAIL_DEFAULT_SENDER = '12313211@qq.com'
