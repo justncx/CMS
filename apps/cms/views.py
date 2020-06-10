@@ -66,7 +66,6 @@ def send_email():
     return '邮件发送成功！！！'
 
 
-
 @bp.route('/')
 @login_required
 def index():
@@ -133,6 +132,9 @@ class ResetPwdView(views.MethodView):
 
 # 先判断登录，再判断权限
 # bp.route('/posts/') 这个要写在上边。为什么？？？
+"""
+多重装饰器，在调用的时候从下往上，在执行内函数的时候从上往下
+"""
 @bp.route('/posts/')
 @login_required
 @permission_required(CMSPermission.POSTER)
@@ -141,24 +143,34 @@ def posts():
 
 
 @bp.route('/comments/')
+@login_required
+@permission_required(CMSPermission.COMMENTER)
 def comments():
     return render_template('cms/cms_comments.html')
 
 
 @bp.route('/boards/')
+@login_required
+@permission_required(CMSPermission.BOARDER)
 def boards():
     return render_template('cms/cms_boards.html')
 
 
 @bp.route('/fusers/')
+@login_required
+@permission_required(CMSPermission.FRONTER)
 def fusers():
     return render_template('cms/cms_fusers.html')
 
 @bp.route('/cusers/')
+@login_required
+@permission_required(CMSPermission.ADMINER)
 def cusers():
     return render_template('cms/cms_cusers.html')
 
 
+@login_required
+@permission_required(CMSPermission.ALL_PERMISSION)
 @bp.route('/croles/')
 def croles():
     return render_template('cms/cms_croles.html')

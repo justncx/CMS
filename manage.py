@@ -5,11 +5,13 @@ from flask_migrate import MigrateCommand, Migrate
 from app import create_app
 from exts import db
 from apps.cms import models as cms_models
+from apps.front import models as front_models
 
 
 CMSRole = cms_models.CMSRole
 CMSPermission = cms_models.CMSPermission
 CMSUser = cms_models.CMSUser
+FrontUser = front_models.FrontUser
 
 app = create_app()
 manager = Manager(app)
@@ -77,6 +79,16 @@ def test_permission(email):
         print('这个用户有访问者的权限')
     else:
         print('这个用户没有访问者的权限')
+
+
+@manager.option('-t', '--telephone', dest='telephone')
+@manager.option('-u', '--username', dest='username')
+@manager.option('-p', '--password', dest='password')
+def create_front_user(telephone, username, password):
+    front_user = FrontUser(telephone=telephone, username=username, password=password)
+    db.session.add(front_user)
+    db.session.commit()
+
 
 
 if __name__ == '__main__':

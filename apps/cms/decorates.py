@@ -9,9 +9,10 @@ import config
 
 # 检查是否登录的装饰器
 def login_required(func):
+    print('%s 我是login_required' % func.__name__)
     @wraps(func)
     def inner(*args, **kwarg):
-        print('login'*12)
+        print('%s 执行login_required' % func.__name__)
         if config.CMS_USER_ID in session:
             return func(*args, **kwarg)
         else:
@@ -21,10 +22,11 @@ def login_required(func):
 
 # 判断用户权限的装饰器
 def permission_required(permission):
-    print('12313123123123131313131231312')
     def outter(func):
+        print('%s 我是permission_required' % func.__name__)
         @wraps(func)
         def inner(*args, **kwargs):
+            print('%s 执行permission_required' % func.__name__)
             user = g.cms_user
             # print(user.roles)
             if user.has_permission(permission):

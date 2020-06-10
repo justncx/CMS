@@ -5,6 +5,7 @@ from apps.common import bp as common_bp
 import config
 from exts import db, mail
 from flask_wtf import CSRFProtect
+from utils.captcha import Captcha
 
 
 def create_app():
@@ -21,6 +22,8 @@ def create_app():
     app.register_blueprint(front_bp)
     app.register_blueprint(common_bp)
     return app
+
+Captcha.gene_graph_captcha()
 
 
 if __name__ == '__main__':
