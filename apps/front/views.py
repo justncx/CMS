@@ -13,7 +13,7 @@ def index():
 
 
 class SginupView(views.MethodView):
-    def get(såelf):
+    def get(self):
         return render_template('front/front_signup.html')
 
 
