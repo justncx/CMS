@@ -7895,7 +7895,7 @@ jQuery.each( ( "blur focus focusin focusout load resize scroll unload click dblc
 			this.on( name, null, data, fn ) :
 			this.trigger( name );
 	};
-} );
+} );∑
 
 jQuery.fn.extend( {
 	hover: function( fnOver, fnOut ) {

@@ -2,7 +2,8 @@
 
 from flask import Blueprint, render_template, views, request, session, redirect,\
     url_for, g, jsonify
-from .forms import LoginForm, ResetPassworldForm, ResetEmailForm
+from .forms import LoginForm, ResetPassworldForm, ResetEmailForm, AddBannerForm,\
+    UpdateBannerForm, AddBoardForm, UpdateBoardForm
 from .models import CMSUser, CMSPermission
 from .decorates import login_required, permission_required
 import config
@@ -11,11 +12,119 @@ from flask_mail import Message
 from utils import restful, lyccache
 import string
 import random
-
-
+from ..models import BannerModel, BorderModel
 
 
 bp = Blueprint('cms', __name__, url_prefix='/cms')
+
+
+@bp.route('/aboard/', methods=['POST'])
+@login_required
+@permission_required(CMSPermission.BOARDER)
+def add_board():
+    form = AddBoardForm(request.form)
+    if form.validate():
+        name = form.name.data
+        board = BorderModel(name=name)
+        db.session.add(board)
+        db.session.commit()
+        return restful.success()
+    else:
+        return restful.paramerror(message=form.get_error())
+
+
+@bp.route('/uboard/', methods=['POST'])
+@login_required
+@permission_required(CMSPermission.BOARDER)
+def update_board():
+    form = UpdateBoardForm(request.form)
+    if form.validate():
+        board_id = form.board_id.data
+        name = form.name.data
+        print(name)
+        board = BorderModel.query.get(board_id)
+        if board:
+            board.name = name
+            db.session.commit()
+            return restful.success()
+        else:
+            return restful.paramerror(message='没有这个板块')
+    else:
+        return restful.paramerror(form.get_error())
+
+
+@bp.route('/dboard/', methods=['POST'])
+@login_required
+@permission_required(CMSPermission.BOARDER)
+def delete_board():
+    board_id = request.form.get('board_id')
+    print(board_id)
+    if not board_id:
+        return restful.paramerror(message='请输入板块ID')
+    board = BorderModel.query.get(board_id)
+    if board:
+        db.session.delete(board)
+        db.session.commit()
+        print('123132')
+        return restful.success()
+    else:
+        return restful.paramerror(message='没有这个板块')
+
+
+@bp.route('/dbanner/', methods=['GET', 'POST'])
+@login_required
+def delete_banner():
+    banner_id = request.form.get('banner_id')
+    if not banner_id:
+        return restful.paramerror(message='请传入轮播图ID')
+    banner = BannerModel.query.get(banner_id)
+    if not banner:
+        return restful.paramerror(message='没有这个轮播图')
+    db.session.delete(banner)
+    db.session.commit()
+    return restful.success()
+
+
+@bp.route('/ubanner/', methods=['GET', 'POST'])
+@login_required
+def update_banner():
+    form = UpdateBannerForm(request.form)
+    if form.validate():
+        banner_id = form.banner_id.data
+        name = form.name.data
+        image_url = form.image_url.data
+        link_url = form.link_url.data
+        priority = form.priority.data
+        banner = BannerModel.query.get(banner_id)
+        if banner:
+            banner.name = name
+            banner.image_url = image_url
+            banner.link_url = link_url
+            banner.priority = priority
+            db.session.commit()
+            return restful.success()
+        else:
+            return restful.paramerror(message='没有这个轮播图')
+    else:
+        return restful.paramerror(message=form.get_error())
+
+
+@bp.route('/abanner/', methods=['GET', 'POST'])
+# @bp.route('/abanner/')
+@login_required
+def add_banner():
+    form = AddBannerForm(request.form)
+    if form.validate():
+        name = form.name.data
+        image_url = form.image_url.data
+        link_url = form.link_url.data
+        priority = form.priority.data
+        banner = BannerModel(name=name, image_url=image_url, link_url=link_url, priority=priority)
+        db.session.add(banner)
+        db.session.commit()
+        return restful.success()
+    else:
+        return restful.paramerror(message=form.get_error())
 
 
 class ResetEmailView(views.MethodView):
@@ -143,6 +252,13 @@ def posts():
     return render_template('cms/cms_posts.html')
 
 
+@bp.route('/banners')
+@login_required
+def banners():
+    banners = BannerModel.query.order_by(BannerModel.priority.desc()).all()
+    return render_template('cms/cms_banners.html', banners=banners)
+
+
 @bp.route('/comments/')
 @login_required
 @permission_required(CMSPermission.COMMENTER)
@@ -154,7 +270,11 @@ def comments():
 @login_required
 @permission_required(CMSPermission.BOARDER)
 def boards():
-    return render_template('cms/cms_boards.html')
+    board_models = BorderModel.query.all()
+    context = {
+        'boards': board_models
+    }
+    return render_template('cms/cms_boards.html', **context)
 
 
 @bp.route('/fusers/')

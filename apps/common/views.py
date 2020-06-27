@@ -1,20 +1,49 @@
 # -*- coding: UTF-8 -*-
 
-from flask import Blueprint, request
+from flask import Blueprint, request, make_response, jsonify
 from utils import restful, lyccache
 import string
 import random
+import qiniu
 from flask_mail import Message
 from exts import mail
 from ..common.forms import EmailForm
+from utils.captcha import Captcha
+from io import BytesIO
 
 
 bp = Blueprint('common', __name__, url_prefix='/common')
 
 
+@bp.route('/uptoken/', methods=['GET', 'POST'])
+def uptoken():
+    ak = 'NRZ2Haj_cLFZ8jQLwGibPjx2MmlUppRonEOB9hZR'
+    sk = '8AkbHHu048eDLLgwLQRTMACl5wnRhv859UUDOhMC'
+    q = qiniu.Auth(access_key=ak, secret_key=sk)
+    bucket = 'flask-new'
+    # print(qiniu.getUploadUrl())
+    token = q.upload_token(bucket)
+    print(token)
+    return jsonify({'uptoken': token})
+
+
+# 图形验证码
+@bp.route('/captcha/')
+def graph_captcha():
+    text, image = Captcha.gene_graph_captcha()
+    lyccache.set(text.lower(), text.lower())
+    out = BytesIO()
+    image.save(out, 'png')
+    out.seek(0)
+    resp = make_response(out.read())
+    resp.content_type = 'image/png'
+    return resp
+
+
 @bp.route('/')
 def index():
     return 'common index'
+
 
 @bp.route('/email_captcha/', methods=['POST'])
 def email_captcha():
@@ -30,6 +59,7 @@ def email_captcha():
         # 随机采样
         captcha = "".join(random.sample(source, 6))
         # 发送验证码
+        print('发送了短信验证码: %s' % captcha)
         message = Message(subject='验证码', recipients=[email], body='您的验证码是%s' % captcha)
         try:
             mail.send(message)

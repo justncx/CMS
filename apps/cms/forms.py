@@ -50,3 +50,21 @@ class ResetEmailForm(BaseForm):
         if db.session.query(CMSUser).filter_by(email=email).first():
             raise ValidationError('该邮箱已注册！')
 
+
+class AddBannerForm(BaseForm):
+    name = StringField(validators=[InputRequired(message='请输入轮播图名称')])
+    image_url = StringField(validators=[InputRequired(message='请输入轮播图的url')])
+    link_url = StringField(validators=[InputRequired(message='请输入轮播图的跳转url')])
+    priority = IntegerField(validators=[InputRequired(message='请输入轮播图的优先级')])
+
+
+class UpdateBannerForm(AddBannerForm):
+    banner_id = IntegerField(validators=[InputRequired(message='请输入轮播图的ID')])
+
+
+class AddBoardForm(BaseForm):
+    name = StringField(validators=[InputRequired(message='请输入板块名称')])
+
+
+class UpdateBoardForm(AddBoardForm):
+    board_id = IntegerField(validators=[InputRequired(message='请输入板块ID')])

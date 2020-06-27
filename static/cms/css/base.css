@@ -195,3 +195,9 @@ body {
 .form-container {
     width: 300px;
 }
+
+.top-box{
+    overflow: hidden;
+    background: #ecedf0;
+    padding: 10px;
+    }

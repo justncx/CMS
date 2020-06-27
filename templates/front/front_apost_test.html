@@ -1,0 +1,17 @@
+{% extends "front/front_base_new.html" %}
+{% from "common/_macros.html" import static %}
+
+{% block title %}
+ 发布帖子
+{% endblock %}
+
+{% block head %}
+    <script src="{{ static('ueditor/ueditor.config.js') }}"></script>
+    <script src="{{ static('ueditor/ueditor.all.min.js') }}"></script>
+    <script src="{{ static("front/js/front_apost.js") }}"></script>
+{% endblock %}
+
+{% block body %}
+        <script id="editor" type="text/plain" style="height:500px;"></script>
+
+{% endblock %}
